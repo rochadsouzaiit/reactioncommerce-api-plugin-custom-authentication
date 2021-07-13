@@ -1,4 +1,5 @@
-import getAccounts from "./accountServer.js";
+import axios from "axios";
+import config from "../config.js";
 /**
  * Given an Authorization Bearer token and the current context, returns the user document
  * for that token after performing token checks.
@@ -8,16 +9,17 @@ import getAccounts from "./accountServer.js";
  *
  * @name getUserFromAuthToken
  * @method
- * @memberof GraphQL
  * @summary Looks up a user by token
  * @param {String} loginToken Auth token
  * @returns {Object} The user associated with the token
  */
 async function getUserFromAuthToken(loginToken) {
-  const { accountsServer } = await getAccounts();
-  const authToken = loginToken.replace(/bearer\s/gi, "");
-  const user = await accountsServer.resumeSession(authToken);
-  return user;
+  const { GET_IDENTITY_FROM_TOKEN_URL } = config;
+  const resp = await axios.get(GET_IDENTITY_FROM_TOKEN_URL, {
+    headers: { Authorization: loginToken }
+  });
+
+  return resp.data;
 }
 
 export default getUserFromAuthToken;
